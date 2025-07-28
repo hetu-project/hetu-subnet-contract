@@ -32,24 +32,13 @@ interface ISubnetManager {
         uint256 timestamp,
         uint256 blockNumber
     );
-    /**
-     * @dev Subnet ownership transfer event
-     */
-    // event SubnetOwnershipTransferred(
-    //     uint16 indexed netuid, 
-    //     address indexed oldOwner, 
-    //     address indexed newOwner
-    // );
-    
-    /**
-     * @dev Subnet information update event
-     */
-    event SubnetInfoUpdated(
-        uint16 indexed netuid, 
-        string name, 
-        string description
+
+    event NetworkConfigUpdated(
+        string indexed paramName,
+        uint256 oldValue,
+        uint256 newValue,
+        address indexed updater
     );
-    
     // ============ Core Functions ============
     
     /**
@@ -74,17 +63,7 @@ interface ISubnetManager {
      */
     // function transferSubnetOwnership(uint16 netuid, address newOwner) external;
     
-    /**
-     * @dev Update subnet information
-     * @param netuid Subnet ID
-     * @param newName New name
-     * @param newDescription New description
-     */
-    function updateSubnetInfo(
-        uint16 netuid,
-        string calldata newName,
-        string calldata newDescription
-    ) external;
+
     
     // ============ View Functions ============
     
@@ -111,6 +90,13 @@ interface ISubnetManager {
         uint256 hetuReserve,
         uint256 alphaReserve
     );
+
+    /**
+     * @dev Check if subnet active
+     * @param netuid Subnet ID
+     * @return isActive True if subnet is active
+     */
+    function isSubnetActive(uint16 netuid) external view returns (bool);
 
     /**
      * @dev Get subnet basic information
@@ -145,25 +131,6 @@ interface ISubnetManager {
      */
     function subnetExists(uint16 netuid) external view returns (bool);
     
-    //**
-    //* @dev Get subnet basic information
-    //* @param netuid Subnet ID
-    //* @return Subnet information struct
-    //**
-    // function subnets(uint16 netuid) external view returns (
-    //     uint16 netuid_,
-    //     address owner,
-    //     address alphaToken,
-    //     address ammPool,
-    //     uint256 lockedAmount,
-    //     uint256 poolInitialTao,
-    //     uint256 burnedAmount,
-    //     uint256 createdAt,
-    //     bool isActive,
-    //     string memory name,
-    //     string memory description
-    // );
-    
     // ============ Network Parameters ============
     
     /**
@@ -177,41 +144,4 @@ interface ISubnetManager {
     function totalNetworks() external view returns (uint16);
     function nextNetuid() external view returns (uint16);
     
-    // ============ Token and Factory References ============
-    
-    /**
-     * @dev Get HETU token address
-     */
-    // function hetuToken() external view returns (address);
-    
-    /**
-     * @dev Get AMM factory address
-     */
-    // function ammFactory() external view returns (address);
-    
-    // ============ Admin Functions (if needed) ============
-    
-    /**
-     * @dev Update network parameters (owner only)
-     * @param newMinLock New minimum lock amount
-     * @param newRateLimit New rate limit
-     * @param newReductionInterval New reduction interval
-     */
-    // function updateNetworkParams(
-    //     uint256 newMinLock,
-    //     uint256 newRateLimit,
-    //     uint256 newReductionInterval
-    // ) external;
-    
-    /**
-     * @dev Emergency pause subnet (owner only)
-     * @param netuid Subnet ID
-     */
-    // function pauseSubnet(uint16 netuid) external;
-    
-    /**
-     * @dev Resume subnet (owner only)
-     * @param netuid Subnet ID
-     */
-    // function resumeSubnet(uint16 netuid) external;
 }

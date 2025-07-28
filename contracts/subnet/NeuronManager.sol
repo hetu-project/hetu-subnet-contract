@@ -20,19 +20,6 @@ contract NeuronManager is ReentrancyGuard, Ownable, INeuronManager {
     // Core storage
     mapping(uint16 => mapping(address => SubnetTypes.NeuronInfo)) internal _neurons;
     mapping(uint16 => address[]) public neuronList;
-    
-    // mapping(address => bool) public authorizedCallers;
-    
-
-    // modifier onlyAuthorizedCaller() {
-    //     require(authorizedCallers[msg.sender], "UNAUTHORIZED_CALLER");
-    //     _;
-    // }
-
-    // modifier onlyAuthorizedCallerOrSelf() {
-    //     require(authorizedCallers[msg.sender] || msg.sender == address(this), "UNAUTHORIZED_CALLER");
-    //     _;
-    // }
 
     
     constructor(
@@ -110,14 +97,15 @@ contract NeuronManager is ReentrancyGuard, Ownable, INeuronManager {
     ) internal {
         // 1. Basic checks
         require(subnetManager.subnetExists(netuid), "SUBNET_NOT_EXISTS");
+        require(subnetManager.isSubnetActive(netuid), "SUBNET_NOT_ACTIVE");
         require(!_neurons[netuid][msg.sender].isActive, "ALREADY_REGISTERED");
 
-
+    
         // 2. Get subnet info and parameters
-        SubnetTypes.SubnetInfo memory subnetInfo = subnetManager.getSubnetInfo(netuid);
+        // SubnetTypes.SubnetInfo memory subnetInfo = subnetManager.getSubnetInfo(netuid);
         SubnetTypes.SubnetHyperparams memory params = subnetManager.getSubnetParams(netuid);
         
-        require(subnetInfo.isActive, "SUBNET_NOT_ACTIVE");
+        // require(subnetInfo.isActive, "SUBNET_NOT_ACTIVE");
 
         // Pre-check: ensure user has enough available stake
         uint256 availableStake = globalStaking.getAvailableStake(msg.sender);
@@ -189,15 +177,15 @@ contract NeuronManager is ReentrancyGuard, Ownable, INeuronManager {
      * @dev Deregister neuron
      */
     function deregisterNeuron(uint16 netuid) external nonReentrant {
-            require(_neurons[netuid][msg.sender].isActive, "NOT_REGISTERED");
-            // Clear neuron
-            delete _neurons[netuid][msg.sender];
-            
-            // Remove from list
-            _removeFromNeuronList(netuid, msg.sender);
-            
-            // Emit event for native code to monitor
-            emit NeuronDeregistered(netuid, msg.sender, block.number);
+        require(_neurons[netuid][msg.sender].isActive, "NOT_REGISTERED");
+        // Clear neuron
+        delete _neurons[netuid][msg.sender];
+        
+        // Remove from list
+        _removeFromNeuronList(netuid, msg.sender);
+        
+        // Emit event for native code to monitor
+        emit NeuronDeregistered(netuid, msg.sender, block.number);
     }
     
     /**
